@@ -13,8 +13,6 @@ public interface Stack<E> {
 	
 	int search(E element);
 	
-	int size();
-	
 	boolean contains(E element);
 	
 	boolean empty();
