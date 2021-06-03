@@ -3,11 +3,11 @@ public interface Stack<E> {
 	
 	void push(E element);
 	
-	void pop();
+	E pop() throws StackUnderflowException;
 	
 	void clear();
 	
-	E peek();
+	E peek() throws StackUnderflowException;
 	
 	E get(int index);
 	
@@ -18,4 +18,6 @@ public interface Stack<E> {
 	boolean contains(E element);
 	
 	boolean empty();
+	
+	String toString();
 }
