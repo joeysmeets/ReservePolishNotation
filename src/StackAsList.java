@@ -95,39 +95,6 @@ public class StackAsList<E> implements Stack<E> {
 		r += position.data;
 		return r;
 	}
-	
-	public static void main(String[] args) throws StackUnderflowException, IOException {
-		/*StackAsList<Integer> ints = new StackAsList<Integer>();
-		ints.push(1);
-		ints.push(2);
-		ints.push(3);
-		ints.push(4);
-		ints.push(5);
-		System.out.println(ints.toString());
-		ints.pop(); //pop the 5
-		System.out.println(ints.peek());
-		System.out.println(ints.toString());
-		System.out.println("Size: " + ints.size());
-		ints.clear();
-		System.out.println("toString after clear: " + ints.toString());
-		System.out.println("Size: " + ints.size());
-		
-		
-		StackAsList<String> strings = new StackAsList<String>();
-		strings.push("string1");
-		strings.push("string2");
-		strings.push("string3");
-		System.out.println(strings.size());
-		System.out.println(strings.toString());
-		strings.clear();
-		strings.peek();*/ //should throw exception
-		
-		Postfix tester = new Postfix();
-		String testInfix = "1 2 + 3 - - -"; //incorrectly formed
-		System.out.println(tester.infixToPostfix(testInfix));
-		
-		System.out.println(tester.evaluate("123*+"));
-		tester.evaluateInfixFromConsole();
-	}
+
 	
 }
