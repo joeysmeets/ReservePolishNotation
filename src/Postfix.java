@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 public class Postfix {
 	private StackAsList<Double> operands;
 	private StackAsList<Character> operators;
@@ -68,12 +70,34 @@ public class Postfix {
 			
 		
 		}
-		
+		return pfx;
 	}
 	
+	public static void main(String[] args) {
+		Postfix test = new Postfix();
+		test.fromConsole();
+	}
+	
+	/*
+	 * implement a method that reads an infix String from the console, converts it to RPN,
+	 * evaluates it, and prints the result to the console.
+	 */
 	public void fromConsole() {
-		//TODO: implement a method that reads an infix String from the console, evaluates it and
-		//prints the result to the console
-	}
-	
+		System.out.println("Put in an Infix-equation without an equal sign here:");
+        Scanner in = new Scanner(System.in);
+        try {
+            while (in.hasNextLine() == true) {
+                String line = in.nextLine();
+                try {
+                    String pf = infixToPostfix(line);
+                    System.out.println("Result: " + evaluate(pf));
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+            }
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
+        in.close();
+    }
 }
