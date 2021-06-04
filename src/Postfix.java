@@ -63,12 +63,37 @@ public class Postfix {
 		if (ifx.isBlank()) {return pfx;}
 		
 		StackAsList<Character> operators = new StackAsList<Character>();
-		StackAsList<Integer> operands = new StackAsList<Integer>();
+		StackAsList<Double> operands = new StackAsList<Double>();
 		
 		for (int i = 0; i < ifx.length(); i++) {
 			Character t = ifx.charAt(i);
 			
-		
+			//t is an operand -> push it to operands stack
+			if(Character.isDigit(t)) {
+				operands.push((double)(Character.getNumericValue(t))); //only works for digits 0-9
+			//t is whitespace -> do nothing, move on to next character
+			}else if (t == ' '){
+				
+			//t is (maybe) an operator
+			}else {
+				double rhs = operands.pop();
+				double lhs = operands.pop();
+				switch (t) {
+					case '+': 
+						result = lhs + rhs;
+						break;
+					case '-':
+						result = lhs - rhs;
+						break;
+					case '/':
+						result = lhs / rhs;
+						break;
+					case '*':
+						result = lhs * rhs;
+						break;
+					case '^':
+						result = Math.pow(lhs, rhs);
+						break;	
 		}
 		return pfx;
 	}
