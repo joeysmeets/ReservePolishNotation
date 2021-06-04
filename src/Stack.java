@@ -9,13 +9,7 @@ public interface Stack<E> {
 	
 	E peek() throws StackUnderflowException;
 	
-	E get(int index);
-	
-	int search(E element);
-	
 	int size();
-	
-	boolean contains(E element);
 	
 	boolean empty();
 	
