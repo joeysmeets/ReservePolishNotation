@@ -4,7 +4,6 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 
 public class Postfix {
-	//https://www.learn4master.com/algorithms/convert-infix-notation-to-reverse-polish-notation-java
 	
 	/*constructor*/
 	public Postfix() {
@@ -17,16 +16,15 @@ public class Postfix {
 	 * @throws StackUnderflowException 
 	 */
 	public double evaluate(String pfx) throws StackUnderflowException {
-		if (pfx == null) {
-			System.out.println("Error");
-		}
+		
+		if (pfx == null) {return 0;}
 		
 		StackAsList<Double> operands = new StackAsList<Double>();
 		
 		double result = 0;
 		
 		for (int i = 0; i < pfx.length(); i++) {
-			Character t = pfx.charAt(i);
+			char t = pfx.charAt(i);
 			//t is an operand -> push it to operands stack
 			if(Character.isDigit(t)) {
 				operands.push((double)(Character.getNumericValue(t))); //only works for digits 0-9
@@ -60,17 +58,20 @@ public class Postfix {
 		return result;
 	}
 	
-	public String infixToPostfix(String ifx) throws StackUnderflowException {
+	public String infixToPostfix(String ifx) throws StackUnderflowException, IncorrectFormatException {
+		
+		String pfx = "";
+		if (ifx.isBlank()) {return pfx;}
+		
+		if (!isFormatted(ifx)) throw new IncorrectFormatException("Incorrectly formatted infix expression.");
+		
 		HashMap<Character, Integer> precedences = new HashMap<>();
+		precedences.put('(', 0);
 		precedences.put('+', 1);
 		precedences.put('-', 1);
 		precedences.put('/', 2);
 		precedences.put('*', 2);
 		precedences.put('^', 3);
-		precedences.put('(', 0);
-		
-		String pfx = "";
-		if (ifx.isBlank()) {return pfx;}
 	
 		StackAsList<Character> operators = new StackAsList<Character>();
 		
@@ -91,36 +92,35 @@ public class Postfix {
 			
 			}else if (isOperator(t)) {
 				//no operators on the stack yet -> add to stack
-				if (operators.empty()) {
-					operators.push(t);
-				}else{
-					//negative if t is higher precedence, 0 if same, positive if t is lower
+				if (operators.empty()) {operators.push(t);}
+				else{
+					//a is negative if t is higher precedence, 0 if same, positive if t is lower precedence
 					int a = precedences.get(operators.peek()) - precedences.get(t);
 					
-					//precedence of t is lower than top or equal precedence and right associative
-					if (a >= 0) { //|| (a == 0 && (t == '+' || t == '*')))
-						while (!operators.empty()) {
+					//precedence of t is lower than top or equal precedence
+					if (a >= 0) {
+						while (!operators.empty() && operators.peek() != '(') {
 							pfx += operators.pop();
 						}
-					}
+					}	
 					operators.push(t);
 				}
 			}
 		}
+		
 		while(!operators.empty()) {
 			pfx += operators.pop();
 		}
 		return pfx;
 	}
 	
-	public double evaluateInfixFromConsole() throws StackUnderflowException, IOException {
+	public void evaluateInfixFromConsole() throws StackUnderflowException, IOException, IncorrectFormatException {
+		System.out.print("Enter an infix expression here: ");
 		InputStreamReader isr = new InputStreamReader(System.in);
 		BufferedReader br = new BufferedReader(isr);
 		String pfx = infixToPostfix(br.readLine());
-		System.out.println(pfx);
 		br.close();
-		isr.close();
-		return evaluate(pfx);
+		System.out.println("Result: " + evaluate(pfx));
 	}
 	
 	public boolean isOperator(char c) {
@@ -131,20 +131,70 @@ public class Postfix {
 	/**
 	 * @param ifx - An infix expression
 	 * @return - true if the expression is correctly formatted, false otherwise
+	 * @throws StackUnderflowException 
 	 */
-	/*public boolean isFormatted(String ifx) {
-		if (ifx.isBlank()) {return true;}
+	public boolean isFormatted(String infix) throws StackUnderflowException {
+		if (infix.isBlank()) {return true;}
+
+		String ifx = infix.replaceAll("\\s+",""); //remove all whitespace
+
+		//length of string is even -> incorrectly formatted
+		if(ifx.length() % 2 == 0) {return false;}
 		
-		int operators = 0;
-		int operands = 0;
-	
-		for (int i = 0; i < ifx.length(); i++) {
-		//should have one less operator than operands
+		//String starts with ')' or an operator -> incorrectly formatted
+		char c = ifx.charAt(0);
+		if(c == ')' || isOperator(c)) {return false;}
+		
+		//String ends with '(' or an operator -> incorrectly formatted
+		c = ifx.charAt(ifx.length() - 1);
+		if(c == '(' || isOperator(c)) {return false;}
+		
+		//Parentheses are not balanced -> incorrectly formatted
+		if(!checkParentheses(ifx)) {return false;}
+		
+		for (int i = 0; i < ifx.length() - 1; i++) {
+			c = ifx.charAt(i);
+			char d = ifx.charAt(i + 1);
 			
-		//each digit (or variable) must be separated from the next digit by an operator
-		
+			//c is a digit, d should b operator or ')'
+			if(Character.isDigit(c) && (Character.isDigit(d) || d == '(')) {return false;}
+			//c is '(', d should be digit or '('
+			if(c == '(' && (isOperator(d) || d == ')')) {return false;}
+			//c is ')', d should be operator or ')'
+			if(c == ')' && (Character.isDigit(d) || d == '(')) {return false;}
+			//c is an operator, d should be digit or '('
+			if(isOperator(c) && (isOperator(d) || d == ')')) {return false;}
 		}
-	}*/
+		
+		return true;
+	}
+	
+	public boolean checkParentheses(String infix) throws StackUnderflowException {
+		
+		StackAsList<Character> parentheses = new StackAsList<Character>();
+		
+		for(int i = 0; i < infix.length(); i++) {
+			char c = infix.charAt(i);
+			
+			if(c == '(') {parentheses.push(c);}
+			
+			if(c == ')') {
+				if(parentheses.empty()) {return false;}
+				else {parentheses.pop();}
+			}
+		}
+		
+		if (parentheses.empty()) {return true;}
+		//if there are any opening parentheses left on stack -> not balanced
+		else {return false;}
+	}
+	
+	public static void main(String[] args) throws StackUnderflowException, IOException, IncorrectFormatException {
+		Postfix tester = new Postfix();
+		
+		tester.evaluateInfixFromConsole();
+	}
+	
 }
 
 
